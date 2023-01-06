@@ -6,7 +6,7 @@ import numpy as np
 from IPython.display import Image, display
 
 
-def showarray(img, converted: int | None = cv2.COLOR_BGR2RGB) -> None:
+def showarray(img: np.ndarray, converted: int | None = cv2.COLOR_BGR2RGB) -> None:
     if converted is not None:
         img = cv2.cvtColor(img, converted)
     f = io.BytesIO()
