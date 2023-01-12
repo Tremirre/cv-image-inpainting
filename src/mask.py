@@ -61,18 +61,28 @@ def add_random_curve(mask: np.ndarray, thickness: int) -> np.ndarray:
 
 
 def generate_random_mask(
-    h: int, w: int, n_lines: int, n_points: int, n_curves: int
+    h: int,
+    w: int,
+    n_lines: int,
+    n_points: int,
+    n_curves: int,
+    min_width: int,
+    max_width: int,
 ) -> np.ndarray:
     mask = np.zeros((h, w), dtype=np.uint8)
     for _ in range(n_lines):
-        mask = add_random_line(mask, np.random.randint(12, 24))
+        mask = add_random_line(mask, np.random.randint(min_width, max_width))
     for _ in range(n_points):
-        mask = add_random_point(mask, np.random.randint(12, 24))
+        mask = add_random_point(mask, np.random.randint(min_width, max_width))
     for _ in range(n_curves):
-        mask = add_random_curve(mask, np.random.randint(12, 24))
+        mask = add_random_curve(mask, np.random.randint(min_width, max_width))
     return mask
 
 
-def generate_random_mask_by_degree(h: int, w: int, degree: str) -> np.ndarray:
+def generate_random_mask_by_degree(
+    h: int, w: int, degree: str, min_width: int, max_width: int
+) -> np.ndarray:
     params = PARAMS[degree]
-    return generate_random_mask(h, w, **params)
+    return generate_random_mask(
+        h, w, **params, min_width=min_width, max_width=max_width
+    )
