@@ -11,21 +11,23 @@ class DatasetFillGenerator(tf.keras.utils.Sequence):
         image_size: tuple[int, int],
         channels: int,
         mask_generator: Callable[[int], np.ndarray],
-        scale_max: float = 1.
+        scale_max: float = 1.,
+        shuffle: bool = True,
     ) -> None:
         self.dataset = dataset
         self.image_size = image_size
         self.channels = channels
         self.mask_generator = mask_generator
         self.scale_max = scale_max
+        self.shuffle = shuffle
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        self.dataset.skip(idx)
-        batch = next(iter(self.dataset))
-        source, target = self._process_batch(batch)
+        for batch in self.dataset.skip(idx).take(1):
+            source, target = self._process_batch(batch)
+            break
         return source, target
 
     def _process_batch(self, batch):
@@ -34,3 +36,7 @@ class DatasetFillGenerator(tf.keras.utils.Sequence):
         target = tf.identity(batch)
         batch = tf.where(masks == 0, batch, self.scale_max)
         return batch, target
+
+    def on_epoch_end(self):
+        if self.shuffle:
+            self.dataset = self.dataset.shuffle(len(self))
