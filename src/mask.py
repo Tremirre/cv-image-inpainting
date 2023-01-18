@@ -86,3 +86,51 @@ def generate_random_mask_by_degree(
     return generate_random_mask(
         h, w, **params, min_width=min_width, max_width=max_width
     )
+
+
+def generate_random_mask_batch_by_degree(
+    batch_size: int,
+    image_height: int,
+    image_width: int,
+    target_channels: int,
+    degree: str,
+    min_width: int,
+    max_width: int,
+) -> np.ndarray:
+    masks = np.zeros((batch_size, image_height, image_width, 1), dtype=np.uint8)
+    for i in range(batch_size):
+        new_mask = generate_random_mask_by_degree(
+            image_height, image_width, degree, min_width, max_width
+        )
+        masks[i] = new_mask[..., np.newaxis]
+    masks = np.repeat(masks, target_channels, axis=-1)
+    return masks
+
+
+class MaskGenerator:
+    def __init__(
+        self,
+        image_height: int,
+        image_width: int,
+        target_channels: int,
+        degree: str,
+        min_width: int,
+        max_width: int,
+    ):
+        self.image_height = image_height
+        self.image_width = image_width
+        self.target_channels = target_channels
+        self.degree = degree
+        self.min_width = min_width
+        self.max_width = max_width
+
+    def __call__(self, batch_size: int) -> np.ndarray:
+        return generate_random_mask_batch_by_degree(
+            batch_size,
+            self.image_height,
+            self.image_width,
+            self.target_channels,
+            self.degree,
+            self.min_width,
+            self.max_width,
+        )
