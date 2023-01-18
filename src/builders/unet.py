@@ -17,18 +17,15 @@ class UNETBuilder:
         skips = []
         for i in range(self.n_layers):
             for _ in range(self.n_convs):
-                x = tf.keras.layers.Conv2D(self.n_filters * 2**i, 3, padding="same")(x)
-                x = tf.keras.layers.Activation(self.activation)(x)
+                x = tf.keras.layers.Conv2D(self.n_filters * 2**i, 3, padding="same", activation=self.activation)(x)
             skips.append(x)
             x = tf.keras.layers.MaxPool2D(2)(x)
         for i in range(self.n_layers):
-            x = tf.keras.layers.Conv2D(self.n_filters * 2**(self.n_layers - i - 1), 3, padding="same")(x)
-            x = tf.keras.layers.Activation(self.activation)(x)
+            x = tf.keras.layers.Conv2D(self.n_filters * 2**(self.n_layers - i - 1), 3, padding="same", activation=self.activation)(x)
             x = tf.keras.layers.UpSampling2D(2)(x)
             x = tf.keras.layers.Concatenate()([x, skips[self.n_layers - i - 1]])
             for _ in range(self.n_convs):
-                x = tf.keras.layers.Conv2D(self.n_filters * 2**(self.n_layers - i - 1), 3, padding="same")(x)
-                x = tf.keras.layers.Activation(self.activation)(x)
+                x = tf.keras.layers.Conv2D(self.n_filters * 2**(self.n_layers - i - 1), 3, padding="same", activation=self.activation)(x)
         outputs = tf.keras.layers.Conv2D(self.output_shape[-1], 1, padding="same", activation=self.last_activation)(x)
         model = tf.keras.Model(inputs=inputs, outputs=outputs)
         return model
