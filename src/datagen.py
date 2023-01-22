@@ -10,8 +10,7 @@ class DatasetFillGenerator(tf.keras.utils.Sequence):
         dataset: tf.data.Dataset,
         image_size: tuple[int, int],
         channels: int,
-        image_augmenter: Callable[[tf.Tensor], tf.Tensor],
-        scale_max: float = 1.,
+        image_augmenter: Callable[[tf.Tensor], tuple[tf.Tensor, tf.Tensor]],
         shuffle: bool = True,
     ) -> None:
         self.dataset = dataset
@@ -25,12 +24,10 @@ class DatasetFillGenerator(tf.keras.utils.Sequence):
 
     def __getitem__(self, idx):
         for batch in self.dataset.skip(idx).take(1):
-            source, target = self._process_batch(batch)
-            break
-        return source, target
+            return self._process_batch(batch)
 
     def _process_batch(self, batch):
-        augmented = self.image_augmenter(batch)
+        augmented, batch = self.image_augmenter(batch)
         return augmented, batch
 
     def on_epoch_end(self):
