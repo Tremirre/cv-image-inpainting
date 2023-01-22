@@ -46,8 +46,8 @@ class CombinedLoss(tf.keras.losses.Loss):
     ):
         if not loss_dict:
             raise ValueError("loss_dict must not be empty")
-        name = "+".join(
-            f"{weight}*{loss_name}" for loss_name, (_, weight) in loss_dict.items()
+        name = "_".join(
+            f"{weight}{loss_name}" for loss_name, (_, weight) in loss_dict.items()
         )
         self.loss_dict = loss_dict
         super().__init__(name=name, **kwargs)
