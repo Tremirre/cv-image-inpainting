@@ -26,3 +26,12 @@ def masked_channel_augmenter(
     augmented = tf.concat([augmented, masks[:, :, :, :1]], axis=-1)
     images = tf.concat([images, masks[:, :, :, :1]], axis=-1)
     return augmented, images
+
+
+def masked_split_augmenter(
+    images: tf.Tensor, mask_generator: Callable[[tf.Tensor], np.ndarray]
+) -> tf.Tensor:
+    masks = mask_generator(images.shape[0])
+    augmented = tf.where(masks == 0, images, 0.0)
+    masks = tf.where(masks == 0, 1.0, 0.0)
+    return (augmented, masks), images
