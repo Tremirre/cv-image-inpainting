@@ -1,0 +1,11 @@
+{
+  "name": "cv3-frontend",
+  "version": "1.0.0",
+  "description": "Client application for easier Image Inpainting models testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bartosz Stachowiak",
+  "license": "ISC"
+}
