@@ -1,10 +1,13 @@
 import json
 import tensorflow as tf
 import logging
+import base64
 
 from flask import Flask, request, Response
+from flask_cors import CORS
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
@@ -27,6 +30,8 @@ def predict():
             mimetype="application/json",
         )
     try:
+        if request.headers["Content-Type"] == "image/jpeg+base64":
+            binary_jpeg = base64.b64decode(binary_jpeg)
         decoded_image = tf.io.decode_jpeg(binary_jpeg)
     except tf.errors.InvalidArgumentError:
         return Response(

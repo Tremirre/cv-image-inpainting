@@ -3,6 +3,7 @@ FROM tensorflow/tensorflow
 WORKDIR /app
 
 RUN pip install flask
+RUN pip install flask-cors
 
 COPY . .
 
