@@ -9,13 +9,11 @@ class DatasetFillGenerator(tf.keras.utils.Sequence):
         self,
         dataset: tf.data.Dataset,
         image_size: tuple[int, int],
-        channels: int,
         image_augmenter: Callable[[tf.Tensor], tuple[tf.Tensor, tf.Tensor]],
         shuffle: bool = True,
     ) -> None:
         self.dataset = dataset
         self.image_size = image_size
-        self.channels = channels
         self.image_augmenter = image_augmenter
         self.shuffle = shuffle
 
