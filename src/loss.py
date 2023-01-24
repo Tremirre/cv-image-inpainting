@@ -40,6 +40,14 @@ class GaussedSobelMAE(tf.keras.losses.Loss):
         return tf.reduce_mean(tf.abs(y_true - y_pred))
 
 
+class SSIMLoss(tf.keras.losses.Loss):
+    def __init__(self, name: str = "SSIMLoss", **kwargs):
+        super().__init__(name=name, **kwargs)
+
+    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
+        return 1 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
+
+
 class CombinedLoss(tf.keras.losses.Loss):
     def __init__(
         self, loss_dict: dict[str, tuple[tf.keras.losses.Loss, float]], **kwargs
