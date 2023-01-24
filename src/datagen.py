@@ -8,12 +8,10 @@ class DatasetFillGenerator(tf.keras.utils.Sequence):
     def __init__(
         self,
         dataset: tf.data.Dataset,
-        image_size: tuple[int, int],
         image_augmenter: Callable[[tf.Tensor], tuple[tf.Tensor, tf.Tensor]],
         shuffle: bool = True,
     ) -> None:
         self.dataset = dataset
-        self.image_size = image_size
         self.image_augmenter = image_augmenter
         self.shuffle = shuffle
 
