@@ -57,3 +57,4 @@ class CombinedLoss(tf.keras.losses.Loss):
         for _, (loss_fn, weight) in self.loss_dict.items():
             loss += weight * loss_fn(y_true, y_pred)
         return loss
+    
