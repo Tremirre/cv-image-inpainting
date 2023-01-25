@@ -1,6 +1,8 @@
-tmp/
 .venv/
+.vscode/
+tmp/
 data/
+models/
 wandb
 
 **.pyc
