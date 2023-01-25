@@ -56,9 +56,10 @@ def predict():
         )
     logging.info(f"Decoded image shape: {decoded_image.shape}")
     logging.info(f"Decoded mask shape: {decoded_mask.shape}")
+    resized_mask = tf.image.resize(decoded_mask, (256, 256), antialias=False)
     resized_image = tf.image.resize(decoded_image, (256, 256)) / 255
     overlay_mask = tf.where(
-        tf.reduce_sum(decoded_mask, axis=-1, keepdims=True) > 0, 1.0, 0.0
+        tf.reduce_sum(resized_mask, axis=-1, keepdims=True) > 0, 1.0, 0.0
     )
     resized_image = tf.where(overlay_mask == 1.0, 0, resized_image)
     mask_size = tf.reduce_sum(overlay_mask)
