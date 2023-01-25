@@ -48,6 +48,20 @@ class SSIMLoss(tf.keras.losses.Loss):
         return 1 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
 
 
+class ExcessivePixelDiffLoss(tf.keras.losses.Loss):
+    def __init__(self, name: str = "ExcessiveVariationLoss", **kwargs):
+        super().__init__(name=name, **kwargs)
+
+    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
+        true_var_x = tf.reduce_mean(tf.abs(y_true[:, 1:, :, :] - y_true[:, :-1, :, :]))
+        true_var_y = tf.reduce_mean(tf.abs(y_true[:, :, 1:, :] - y_true[:, :, :-1, :]))
+        pred_var_x = tf.reduce_mean(tf.abs(y_pred[:, 1:, :, :] - y_pred[:, :-1, :, :]))
+        pred_var_y = tf.reduce_mean(tf.abs(y_pred[:, :, 1:, :] - y_pred[:, :, :-1, :]))
+        dvar_X = pred_var_x - true_var_x
+        dvar_Y = pred_var_y - true_var_y
+        return tf.maximum(dvar_X, 0) + tf.maximum(dvar_Y, 0)
+
+
 class CombinedLoss(tf.keras.losses.Loss):
     def __init__(
         self, loss_dict: dict[str, tuple[tf.keras.losses.Loss, float]], **kwargs
@@ -65,4 +79,3 @@ class CombinedLoss(tf.keras.losses.Loss):
         for _, (loss_fn, weight) in self.loss_dict.items():
             loss += weight * loss_fn(y_true, y_pred)
         return loss
-    
