@@ -11,14 +11,12 @@ const canvasCtx = srcCanvas.getContext('2d');
 const backendURL = 'http://127.0.0.1:5000';
 var drawing = false;
 
-srcCanvas.height = 256;
-srcCanvas.width = 256;
 canvasCtx.lineWidth = 12;
 canvasCtx.lineCap = 'round';
 canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
 
 clearMaskButton.addEventListener('click', (event) => {
-    canvasCtx.clearRect(0, 0, 256, 256);
+    canvasCtx.clearRect(0, 0, srcCanvas.height, srcCanvas.width);
 })
 
 refreshModelsButton.addEventListener('click', (event) => {
@@ -44,7 +42,7 @@ imageInput.addEventListener('change', (event) => {
     const reader = new FileReader();
     reader.onload = (event) => {
         srcImage.src = event.target.result;
-        canvasCtx.clearRect(0, 0, 256, 256);
+        canvasCtx.clearRect(0, 0, srcCanvas.height, srcCanvas.width);
     }
     reader.readAsDataURL(event.target.files[0]);
 });
