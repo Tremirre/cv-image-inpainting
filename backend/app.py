@@ -58,18 +58,32 @@ def predict():
     logging.info(f"Decoded mask shape: {decoded_mask.shape}")
     resized_mask = tf.image.resize(decoded_mask, (256, 256), antialias=False)
     resized_image = tf.image.resize(decoded_image, (256, 256)) / 255
-    overlay_mask = tf.where(
-        tf.reduce_sum(resized_mask, axis=-1, keepdims=True) > 0, 1.0, 0.0
-    )
-    resized_image = tf.where(overlay_mask == 1.0, 0, resized_image)
+    if "pconv" not in model_name:
+        overlay_mask = tf.where(
+            tf.reduce_sum(resized_mask, axis=-1, keepdims=True) > 0, 1.0, 0.0
+        )
+        resized_image = tf.where(overlay_mask == 1.0, 0, resized_image)
+    else:
+        overlay_mask = tf.where(
+            tf.reduce_sum(resized_mask, axis=-1, keepdims=True) > 0, 0.0, 1.0
+        )
+        resized_image = tf.where(overlay_mask == 0.0, 0, resized_image)
     mask_size = tf.reduce_sum(overlay_mask)
     logging.info(f"Masked pixels: {mask_size} ({mask_size / 256 ** 2 * 100:.2f} %)")
 
-    resized_image = tf.concat([resized_image, overlay_mask], axis=-1)
-    reshaped_image = tf.reshape(resized_image, (1, 256, 256, 4))
-    logging.info(f"Reshaped image shape: {reshaped_image.shape}")
-    filled_image = used_model(reshaped_image)
-    filled_image = tf.reshape(filled_image, (256, 256, 4))
+    if "pconv" not in model_name:
+        model_input = tf.concat([resized_image, overlay_mask], axis=-1)
+        model_input = tf.reshape(model_input, (1, 256, 256, 4))
+    else:
+        mask_extended = tf.concat([overlay_mask] * 3, axis=-1)
+        image = tf.reshape(resized_image, (1, 256, 256, 3))
+        image = tf.cast(image, tf.float32)
+        mask_extended = tf.reshape(mask_extended, (1, 256, 256, 3))
+        mask_extended = tf.cast(mask_extended, tf.float32)
+        model_input = [image, mask_extended]
+
+    filled_image = used_model(model_input)
+    filled_image = filled_image[0]
     filled_image = filled_image[:, :, :3] * 255
     filled_image = tf.cast(filled_image, tf.uint8)
     filled_image = tf.image.encode_jpeg(filled_image)
